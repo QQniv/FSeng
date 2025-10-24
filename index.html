@@ -7,68 +7,34 @@
   <meta name="description" content="FS — чистая вода как сервис: здоровье, экология, без пластика и без хлопот." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Anton — веб-альтернатива Impact -->
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <div class="bg-soft" aria-hidden="true">
-    <svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="none">
-      <defs>
-        <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="70" edgeMode="duplicate" />
-        </filter>
-        <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#eaf1ff" />
-          <stop offset="100%" stop-color="#f7fbff" />
-        </linearGradient>
-      </defs>
-      <rect width="1200" height="800" fill="url(#grad)"></rect>
-      <g filter="url(#blur)" opacity="0.7">
-        <circle cx="200" cy="150" r="160" fill="#DDE7FF"/>
-        <circle cx="1000" cy="120" r="200" fill="#CFE0FF"/>
-        <circle cx="900" cy="640" r="220" fill="#E6F0FF"/>
-        <circle cx="260" cy="600" r="200" fill="#F0F6FF"/>
-      </g>
-    </svg>
-  </div>
 
+<body>
   <header class="site-header">
-    <a class="logo" href="#" aria-label="FS — на главную">
-      <span class="logo-f">F</span><span class="logo-s">S</span>
-    </a>
+    <a class="logo" href="#">FS</a>
     <nav class="nav">
-      <a href="#" class="nav-link">Услуги</a>
-      <a href="#" class="nav-link">Технологии</a>
-      <a href="#" class="nav-link">Контакты</a>
+      <a href="#">Услуги</a>
+      <a href="#">Технологии</a>
+      <a href="#">Контакты</a>
     </nav>
   </header>
 
-  <main class="hero" role="main">
+  <main class="hero">
     <h1 class="hero-title">Новый подход к воде</h1>
-
-    <section class="counter" aria-live="polite">
+    <section class="counter">
       <div class="counter-label">Сэкономлено пластиковых бутылок</div>
-
-      <!-- Двойная анимация: новый въезжает сверху, старый уезжает вниз -->
       <div class="counter-rolling">
         <div class="counter-drum" id="drum">
-          <div class="pane pane--current" id="paneCurrent">500&nbsp;тыс.</div>
-          <div class="pane pane--next    pane--enter" id="paneNext">600&nbsp;тыс.</div>
+          <div class="pane pane--current" id="paneCurrent">50&nbsp;тыс.</div>
+          <div class="pane pane--enter" id="paneNext">100&nbsp;тыс.</div>
         </div>
       </div>
-
       <div class="counter-meta">в России — оценка в реальном времени*</div>
-      <details class="counter-notes">
-        <summary>Что за цифра?</summary>
-        <div>
-          Расчёт из допущения: ~200&nbsp;млрд одноразовых бутылок в год ≈ 6&nbsp;342 шт/сек (365 дней).
-          Отображение — шагами по 100&nbsp;000 шт. (перелистывание примерно раз в 15–16 секунд).
-        </div>
-      </details>
     </section>
   </main>
 
-  <script src="./script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
