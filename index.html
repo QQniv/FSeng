@@ -50,27 +50,26 @@
     <section class="counter" aria-live="polite">
       <div class="counter-label">Сэкономлено пластиковых бутылок</div>
 
-      <!-- Барабанная прокрутка десятков тысяч -->
+      <!-- Двойная анимация сверху вниз (новая приезжает сверху, старая уезжает вниз) -->
       <div class="counter-rolling">
         <div class="counter-drum" id="drum">
           <div class="reel">
-            <span class="num" id="numA">0</span>
-            <span class="num" id="numB">10</span>
+            <span class="num active" id="numCurrent">500 тыс.</span>
+            <span class="num above"  id="numNext">1 000 тыс.</span>
           </div>
         </div>
-        <span class="counter-k">тыс.</span>
       </div>
 
       <div class="counter-meta">в России — оценка в реальном времени*</div>
       <details class="counter-notes">
         <summary>Что за цифра?</summary>
         <div>
-          Расчёт из допущения: ~200 млрд одноразовых бутылок в год ≈ 6 341,958 шт/сек.
-          Показываем округлённо по «десяткам тысяч» (10 тыс., 20 тыс., …) с плавной прокруткой.
+          Расчёт из допущения: ~200 млрд одноразовых бутылок в год ≈ 6 342 шт/сек (365 дней).
+          Отображение округлено шагом в 500 000 шт. («перелистывание» каждые ~78,8 сек).
         </div>
       </details>
     </section>
-    <!-- ниже — добавим блоки на следующем шаге -->
+    <!-- ниже добавим остальные блоки на следующих шагах -->
   </main>
 
   <script src="./script.js"></script>
