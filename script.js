@@ -1,27 +1,28 @@
-// === Bottle-Saver Counter — шаг 100 тыс., плавный «верх→низ», без откатов ===
+// === Bottle-Saver Counter — шаг 200 тыс., плавный верх→низ, левое выравнивание ===
 const YEAR_TOTAL   = 200_000_000_000;
 const SECONDS_YEAR = 365 * 24 * 60 * 60;
-const PER_SECOND   = YEAR_TOTAL / SECONDS_YEAR;    // ≈ 6341.958
+const PER_SECOND   = YEAR_TOTAL / SECONDS_YEAR;     // ≈ 6341.958
 const PER_MS       = PER_SECOND / 1000;
-const STEP         = 100_000;                      // перелистывание каждые 100 тыс.
 
-// Стартовое значение (можно поменять на расчёт «с начала года»)
+/* Шаг перелистывания (≈ каждые 31–32 сек при ~6342 бут/сек) */
+const STEP         = 200_000;
+
+/* Стартовое значение (можно заменить на «с начала года» при желании) */
 let value       = 500_000;
 let shownBucket = 500_000;
 let last        = performance.now();
 
 const drum        = document.getElementById('drum');
-let paneCurrent   = document.getElementById('paneCurrent');
-let paneNext      = document.getElementById('paneNext');
+let paneCurrent   = document.getElementById('paneCurrent'); // видимый
+let paneNext      = document.getElementById('paneNext');    // ждёт сверху
 
 function fmt(n){
-  // «X тыс.» с неразрывными пробелами
   const thousands = (n / 1000).toLocaleString('ru-RU');
-  return `${thousands} тыс.`;
+  return `${thousands} тыс.`;             // число и «тыс.» в одном стиле
 }
 
+/* Измеряем ширину текста, чтобы барабан не «дёргался» */
 function measureWidth(text){
-  // создаём невидимый клон, чтобы померить ширину
   const probe = document.createElement('div');
   probe.className = 'pane pane--current';
   probe.style.position = 'absolute';
@@ -33,7 +34,6 @@ function measureWidth(text){
   probe.remove();
   return w;
 }
-
 function adjustWidth(){
   const w = Math.max(measureWidth(paneCurrent.textContent),
                      measureWidth(paneNext.textContent));
@@ -57,39 +57,35 @@ function animateTo(targetBucket){
   if (animating) { pendingBucket = targetBucket; return; }
   animating = true;
 
-  // подготовим текст для «въезжающей» сверху
+  // готовим верхнюю панель к новому значению
   paneNext.textContent = fmt(targetBucket);
   adjustWidth();
 
-  // запускаем: текущая уходит вниз, следующая въезжает
+  // текущая уезжает вниз, новая въезжает сверху
   paneCurrent.classList.remove('pane--current');
   paneCurrent.classList.add('pane--leave');
 
   paneNext.classList.remove('pane--enter');
   paneNext.classList.add('pane--current');
 
-  // когда въезжающая закончила анимацию — меняем роли без резкого «отката»
   const onEnd = (e) => {
     if (e.propertyName !== 'transform') return;
     paneNext.removeEventListener('transitionend', onEnd);
 
     shownBucket = targetBucket;
 
-    // меняем ссылки: current ↔ next
+    // ротация ссылок: кто был current, станет next и спрячется сверху
     const old = paneCurrent;
     paneCurrent = paneNext;
-    paneNext    = old;
+    paneNext = old;
 
-    // готовим «новую верхнюю» на следующий шаг и прячем её сверху
-    paneNext.className   = 'pane pane--enter';
+    paneNext.className = 'pane pane--enter';
     paneNext.textContent = fmt(shownBucket + STEP);
 
     animating = false;
 
     if (pendingBucket && pendingBucket !== shownBucket){
-      const nb = pendingBucket;
-      pendingBucket = null;
-      // минимальная задержка, чтобы браузер применил классы
+      const nb = pendingBucket; pendingBucket = null;
       setTimeout(()=>animateTo(nb), 0);
     }
   };
@@ -100,7 +96,7 @@ function animateTo(targetBucket){
 function tick(now){
   const dt = now - last;
   last = now;
-  value += dt * PER_MS; // непрерывный рост
+  value += dt * PER_MS;                         // непрерывный рост
 
   const bucket = Math.floor(value / STEP) * STEP;
   if (bucket > shownBucket){
@@ -112,8 +108,8 @@ function tick(now){
 setInitial();
 requestAnimationFrame(tick);
 
-// Уважение prefers-reduced-motion — без анимации, просто обновляем текст
+/* prefers-reduced-motion — просто обновляем текст без анимации */
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   paneCurrent.style.transition = 'none';
-  paneNext.style.transition    = 'none';
+  paneNext.style.transition = 'none';
 }
