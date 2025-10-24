@@ -1,7 +1,7 @@
 :root{
   --bg:#ffffff;
   --ink:#0A0D10;
-  --blue:#3563FF;
+  --blue:#3563FF;          /* яркий синий как в рефе */
   --ink-60:rgba(10,13,16,.6);
 }
 *{box-sizing:border-box}
@@ -35,7 +35,6 @@ body{
   backdrop-filter:saturate(180%) blur(8px);
   border-bottom:1px solid rgba(11,15,20,.06);
 }
-
 .logo{
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
   font-size:28px;
@@ -90,7 +89,7 @@ body{
   letter-spacing:.2px;
 }
 
-/* Барабанная прокрутка */
+/* Барабанная прокрутка (сверху вниз) */
 .counter-rolling{
   display:inline-flex;
   align-items:flex-end;
@@ -98,32 +97,28 @@ body{
   margin-top:8px;
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
   color:var(--blue);
-  font-size: clamp(42px, 11vw, 120px);
+  font-size: clamp(42px, 11vw, 120px);   /* единый размер для числа и "тыс." */
   text-shadow:0 8px 28px rgba(53,99,255,.25);
 }
-
 .counter-drum{
   position:relative;
   overflow:hidden;
-  height:1em;
+  height:1em;            /* высота строки цифры */
   line-height:1;
 }
-
 .reel{
   display:flex;
   flex-direction:column;
-  transform: translateY(0%);
-  will-change:transform;
+  transform: translateY(-100%); /* старт: верхняя строка спрятана выше окна */
+  will-change: transform;
   transition: transform .8s cubic-bezier(.22,.65,.22,1);
 }
-
 .counter-drum .num{
   height:1em;
   line-height:1;
   display:block;
   text-align:right;
 }
-
 .counter-k{
   color:var(--blue);
   line-height:1;
@@ -134,7 +129,6 @@ body{
   margin-top:6px;
   color:var(--ink-60);
 }
-
 .counter-notes{
   margin-top:10px;
   color:var(--ink-60);
