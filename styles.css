@@ -1,7 +1,7 @@
 :root{
   --bg:#ffffff;
   --ink:#0A0D10;
-  --blue:#3563FF;
+  --blue:#3563FF;          /* яркий синий как в рефе */
   --ink-60:rgba(10,13,16,.6);
 }
 *{box-sizing:border-box}
@@ -14,7 +14,7 @@ body{
   background:var(--bg);
 }
 
-/* === Фон === */
+/* === Мягкий водный фон === */
 .bg-soft{
   position:fixed;
   inset:0;
@@ -80,10 +80,16 @@ body{
 .hero-title::selection{background:var(--blue); color:#fff;}
 
 /* === Счётчик === */
-.counter{ margin-top: clamp(14px, 3vw, 20px); }
-.counter-label{ font-weight:600; color:var(--ink-60); letter-spacing:.2px; }
+.counter{
+  margin-top: clamp(14px, 3vw, 20px);
+}
+.counter-label{
+  font-weight:600;
+  color:var(--ink-60);
+  letter-spacing:.2px;
+}
 
-/* Барабанная двойная прокрутка */
+/* Двойная прокрутка сверху вниз: новая цифра заезжает сверху, старая уезжает вниз */
 .counter-rolling{
   display:inline-flex;
   align-items:flex-end;
@@ -91,50 +97,42 @@ body{
   margin-top:8px;
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
   color:var(--blue);
-  font-size: clamp(42px, 11vw, 120px);
+  font-size: clamp(42px, 11vw, 120px);   /* единый размер как у цифры, так и у "тыс." (вшито в текст) */
   text-shadow:0 8px 28px rgba(53,99,255,.25);
 }
 
 .counter-drum{
   position:relative;
   overflow:hidden;
-  height:1em;
+  height:1em;            /* высота строки цифры */
   line-height:1;
 }
 .reel{
   position:relative;
-  height:2em; /* две цифры, по одной строке каждая */
+  height:1em;            /* в окне видна ровно одна строка */
 }
 .num{
   position:absolute;
-  left:0;
-  width:100%;
+  left:0; right:0;
   height:1em;
   line-height:1;
   text-align:right;
-  transition: transform 1.2s cubic-bezier(.22,.65,.22,1);
-}
-
-/* при смене значения */
-.num.active{
   transform: translateY(0%);
   opacity:1;
-}
-.num.prev{
-  transform: translateY(100%);
-  opacity:0;
-}
-.num.next{
-  transform: translateY(-100%);
-  opacity:0;
+  transition: transform 1.0s cubic-bezier(.22,.65,.22,1), opacity .9s ease;
 }
 
-.counter-k{
-  color:var(--blue);
-  line-height:1;
-  font-weight:700;
-}
+/* Состояния */
+.num.active { transform: translateY(0%);   opacity:1; }
+.num.above  { transform: translateY(-100%); opacity:0; }
+.num.below  { transform: translateY(100%);  opacity:0; }
 
-.counter-meta{ margin-top:6px; color:var(--ink-60); }
-.counter-notes{ margin-top:10px; color:var(--ink-60); }
+.counter-meta{
+  margin-top:6px;
+  color:var(--ink-60);
+}
+.counter-notes{
+  margin-top:10px;
+  color:var(--ink-60);
+}
 .counter-notes summary{cursor:pointer;}
