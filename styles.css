@@ -1,7 +1,7 @@
 :root{
   --bg:#ffffff;
   --ink:#0A0D10;
-  --blue:#3563FF;
+  --blue:#3563FF;          /* яркий синий как в рефе */
   --ink-60:rgba(10,13,16,.6);
 }
 *{box-sizing:border-box}
@@ -14,13 +14,22 @@ body{
   background:var(--bg);
 }
 
-/* === Мягкий фон === */
-.bg-soft{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
+/* === Мягкий водный фон === */
+.bg-soft{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+}
 
 /* === Шапка === */
 .site-header{
-  position:sticky; top:0; z-index:20;
-  display:flex; align-items:center; justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   padding:18px clamp(16px, 6vw, 48px);
   background:rgba(255,255,255,.6);
   backdrop-filter:saturate(180%) blur(8px);
@@ -28,34 +37,64 @@ body{
 }
 .logo{
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
-  font-size:28px; letter-spacing:.5px; text-decoration:none; color:var(--ink);
-  display:inline-flex; align-items:center; gap:4px;
+  font-size:28px;
+  letter-spacing:.5px;
+  text-decoration:none;
+  color:var(--ink);
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
 }
 .logo-f,.logo-s{
-  display:inline-block; line-height:1; padding:2px 6px; border-radius:12px;
-  border:2px solid var(--ink); transform:translateY(1px);
+  display:inline-block;
+  line-height:1;
+  padding:2px 6px;
+  border-radius:12px;
+  border:2px solid var(--ink);
+  transform:translateY(1px);
 }
 .logo-s{ color:#fff; background:var(--ink); }
-.nav{display:flex; gap:22px}
-.nav-link{ color:var(--ink); text-decoration:none; font-weight:600; opacity:.8; transition:opacity .2s ease; }
-.nav-link:hover{opacity:1}
+
+.nav{display:flex; gap:22px;}
+.nav-link{
+  color:var(--ink);
+  text-decoration:none;
+  font-weight:600;
+  opacity:.8;
+  transition:opacity .2s ease;
+}
+.nav-link:hover{opacity:1;}
 
 /* === Hero === */
-.hero{ padding: clamp(40px, 7vw, 80px) clamp(16px, 6vw, 48px) 60px; }
+.hero{
+  padding: clamp(40px, 7vw, 80px) clamp(16px, 6vw, 48px) 60px;
+}
 .hero-title{
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
   font-size: clamp(44px, 12vw, 140px);
-  line-height:.9; letter-spacing:1px; margin:12px 0 18px; color:var(--ink);
+  line-height:.9;
+  letter-spacing:1px;
+  margin:12px 0 18px;
+  color:var(--ink);
 }
-.hero-title::selection{background:var(--blue); color:#fff}
+.hero-title::selection{background:var(--blue); color:#fff;}
 
 /* === Счётчик === */
-.counter{ margin-top: clamp(14px, 3vw, 20px); }
-.counter-label{ font-weight:600; color:var(--ink-60); letter-spacing:.2px; }
+.counter{
+  margin-top: clamp(14px, 3vw, 20px);
+}
+.counter-label{
+  font-weight:600;
+  color:var(--ink-60);
+  letter-spacing:.2px;
+}
 
-/* Двойная прокрутка сверху вниз */
+/* Двойная анимация (сверху вниз) + фикс ширины */
 .counter-rolling{
-  display:inline-flex; align-items:flex-end; gap:8px; margin-top:8px;
+  display:inline-flex;
+  align-items:flex-end;
+  gap:8px;
+  margin-top:8px;
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
   color:var(--blue);
   font-size: clamp(42px, 11vw, 120px);
@@ -65,26 +104,27 @@ body{
 .counter-drum{
   position:relative;
   overflow:hidden;
-  height:1em;               /* высота строки */
+  height:1em;            /* высота строки */
   line-height:1;
-  /* начальная ширина, чтобы цифра была видна сразу */
-  min-width: 8ch;
+  min-width: 10ch;       /* базовая ширина, далее JS подгонит под текст */
 }
 
-.reel{ position:relative; height:1em; }
-
-.num{
-  position:absolute; left:0; right:0;
-  height:1em; line-height:1; text-align:right;
-  transform: translateY(0%); opacity:1;
-  transition: transform 1.0s cubic-bezier(.22,.65,.22,1), opacity .9s ease;
+.pane{
+  position:absolute;
+  left:0; right:0;
+  height:1em;
+  line-height:1;
+  text-align:right;
+  transform: translateY(0%);
+  opacity:1;
+  transition: transform .9s cubic-bezier(.25,.7,.2,1), opacity .9s ease;
   will-change: transform, opacity;
 }
 
-/* Состояния */
-.num.active { transform: translateY(0%);    opacity:1; }
-.num.above  { transform: translateY(-100%); opacity:0; }
-.num.below  { transform: translateY(100%);  opacity:0; }
+/* Состояния движения */
+.pane--current{ transform: translateY(0%);   opacity:1; }
+.pane--enter  { transform: translateY(-100%); opacity:0; } /* ждёт сверху */
+.pane--leave  { transform: translateY(100%);  opacity:0; } /* уходит вниз */
 
 .counter-meta{ margin-top:6px; color:var(--ink-60); }
 .counter-notes{ margin-top:10px; color:var(--ink-60); }
