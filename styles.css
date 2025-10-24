@@ -1,119 +1,131 @@
-// === Bottle-Saver Counter — шаг 100 тыс., плавный «верх→низ», без откатов ===
-const YEAR_TOTAL   = 200_000_000_000;
-const SECONDS_YEAR = 365 * 24 * 60 * 60;
-const PER_SECOND   = YEAR_TOTAL / SECONDS_YEAR;    // ≈ 6341.958
-const PER_MS       = PER_SECOND / 1000;
-const STEP         = 100_000;                      // перелистывание каждые 100 тыс.
-
-// Стартовое значение (можно поменять на расчёт «с начала года»)
-let value       = 500_000;
-let shownBucket = 500_000;
-let last        = performance.now();
-
-const drum        = document.getElementById('drum');
-let paneCurrent   = document.getElementById('paneCurrent');
-let paneNext      = document.getElementById('paneNext');
-
-function fmt(n){
-  // «X тыс.» с неразрывными пробелами
-  const thousands = (n / 1000).toLocaleString('ru-RU');
-  return `${thousands} тыс.`;
+:root{
+  --bg:#ffffff;
+  --ink:#0A0D10;
+  --blue:#3563FF;          /* яркий синий как в рефе */
+  --ink-60:rgba(10,13,16,.6);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--ink);
+  background:var(--bg);
 }
 
-function measureWidth(text){
-  // создаём невидимый клон, чтобы померить ширину
-  const probe = document.createElement('div');
-  probe.className = 'pane pane--current';
-  probe.style.position = 'absolute';
-  probe.style.visibility = 'hidden';
-  probe.style.opacity = '0';
-  probe.textContent = text;
-  drum.appendChild(probe);
-  const w = probe.getBoundingClientRect().width;
-  probe.remove();
-  return w;
+/* === Мягкий водный фон === */
+.bg-soft{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
 }
 
-function adjustWidth(){
-  const w = Math.max(measureWidth(paneCurrent.textContent),
-                     measureWidth(paneNext.textContent));
-  drum.style.width = w + 'px';
+/* === Шапка === */
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px clamp(16px, 6vw, 48px);
+  background:rgba(255,255,255,.6);
+  backdrop-filter:saturate(180%) blur(8px);
+  border-bottom:1px solid rgba(11,15,20,.06);
+}
+.logo{
+  font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
+  font-size:28px;
+  letter-spacing:.5px;
+  text-decoration:none;
+  color:var(--ink);
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.logo-f,.logo-s{
+  display:inline-block;
+  line-height:1;
+  padding:2px 6px;
+  border-radius:12px;
+  border:2px solid var(--ink);
+  transform:translateY(1px);
+}
+.logo-s{ color:#fff; background:var(--ink); }
+
+.nav{display:flex; gap:22px;}
+.nav-link{
+  color:var(--ink);
+  text-decoration:none;
+  font-weight:600;
+  opacity:.8;
+  transition:opacity .2s ease;
+}
+.nav-link:hover{opacity:1;}
+
+/* === Hero === */
+.hero{
+  padding: clamp(40px, 7vw, 80px) clamp(16px, 6vw, 48px) 60px;
+}
+.hero-title{
+  font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
+  font-size: clamp(44px, 12vw, 140px);
+  line-height:.9;
+  letter-spacing:1px;
+  margin:12px 0 18px;
+  color:var(--ink);
+}
+.hero-title::selection{background:var(--blue); color:#fff;}
+
+/* === Счётчик === */
+.counter{
+  margin-top: clamp(14px, 3vw, 20px);
+}
+.counter-label{
+  font-weight:600;
+  color:var(--ink-60);
+  letter-spacing:.2px;
 }
 
-function setInitial(){
-  paneCurrent.textContent = fmt(shownBucket);
-  paneCurrent.className   = 'pane pane--current';
-
-  paneNext.textContent    = fmt(shownBucket + STEP);
-  paneNext.className      = 'pane pane--enter';
-
-  adjustWidth();
+/* Двойная анимация (сверху вниз) + фикс ширины */
+.counter-rolling{
+  display:inline-flex;
+  align-items:flex-end;
+  gap:8px;
+  margin-top:8px;
+  font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
+  color:var(--blue);
+  font-size: clamp(42px, 11vw, 120px);
+  text-shadow:0 8px 28px rgba(53,99,255,.25);
 }
 
-let animating = false;
-let pendingBucket = null;
-
-function animateTo(targetBucket){
-  if (animating) { pendingBucket = targetBucket; return; }
-  animating = true;
-
-  // подготовим текст для «въезжающей» сверху
-  paneNext.textContent = fmt(targetBucket);
-  adjustWidth();
-
-  // запускаем: текущая уходит вниз, следующая въезжает
-  paneCurrent.classList.remove('pane--current');
-  paneCurrent.classList.add('pane--leave');
-
-  paneNext.classList.remove('pane--enter');
-  paneNext.classList.add('pane--current');
-
-  // когда въезжающая закончила анимацию — меняем роли без резкого «отката»
-  const onEnd = (e) => {
-    if (e.propertyName !== 'transform') return;
-    paneNext.removeEventListener('transitionend', onEnd);
-
-    shownBucket = targetBucket;
-
-    // меняем ссылки: current ↔ next
-    const old = paneCurrent;
-    paneCurrent = paneNext;
-    paneNext    = old;
-
-    // готовим «новую верхнюю» на следующий шаг и прячем её сверху
-    paneNext.className   = 'pane pane--enter';
-    paneNext.textContent = fmt(shownBucket + STEP);
-
-    animating = false;
-
-    if (pendingBucket && pendingBucket !== shownBucket){
-      const nb = pendingBucket;
-      pendingBucket = null;
-      // минимальная задержка, чтобы браузер применил классы
-      setTimeout(()=>animateTo(nb), 0);
-    }
-  };
-
-  paneNext.addEventListener('transitionend', onEnd);
+.counter-drum{
+  position:relative;
+  overflow:hidden;
+  height:1em;            /* высота строки */
+  line-height:1;
+  min-width: 10ch;       /* базовая ширина, далее JS подгонит под текст */
 }
 
-function tick(now){
-  const dt = now - last;
-  last = now;
-  value += dt * PER_MS; // непрерывный рост
-
-  const bucket = Math.floor(value / STEP) * STEP;
-  if (bucket > shownBucket){
-    animateTo(bucket);
-  }
-  requestAnimationFrame(tick);
+.pane{
+  position:absolute;
+  left:0; right:0;
+  height:1em;
+  line-height:1;
+  text-align:right;
+  transform: translateY(0%);
+  opacity:1;
+  transition: transform .9s cubic-bezier(.25,.7,.2,1), opacity .9s ease;
+  will-change: transform, opacity;
 }
 
-setInitial();
-requestAnimationFrame(tick);
+/* Состояния движения */
+.pane--current{ transform: translateY(0%);   opacity:1; }
+.pane--enter  { transform: translateY(-100%); opacity:0; } /* ждёт сверху */
+.pane--leave  { transform: translateY(100%);  opacity:0; } /* уходит вниз */
 
-// Уважение prefers-reduced-motion — без анимации, просто обновляем текст
-if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-  paneCurrent.style.transition = 'none';
-  paneNext.style.transition    = 'none';
-}
+.counter-meta{ margin-top:6px; color:var(--ink-60); }
+.counter-notes{ margin-top:10px; color:var(--ink-60); }
+.counter-notes summary{cursor:pointer;}
