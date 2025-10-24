@@ -14,81 +14,83 @@ body{
   background:var(--bg);
 }
 
-/* Мягкий фон */
-.bg-soft{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
+/* === Мягкий водный фон === */
+.bg-soft{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+}
 
-/* Header */
+/* === Шапка === */
 .site-header{
-  position:sticky; top:0; z-index:20;
-  display:flex; align-items:center; justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   padding:18px clamp(16px, 6vw, 48px);
   background:rgba(255,255,255,.6);
   backdrop-filter:saturate(180%) blur(8px);
   border-bottom:1px solid rgba(11,15,20,.06);
 }
+
 .logo{
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
-  font-size:28px; letter-spacing:.5px; text-decoration:none; color:var(--ink);
-  display:inline-flex; align-items:center; gap:4px;
+  font-size:28px;
+  letter-spacing:.5px;
+  text-decoration:none;
+  color:var(--ink);
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
 }
 .logo-f,.logo-s{
-  display:inline-block; line-height:1; padding:2px 6px; border-radius:12px;
-  border:2px solid var(--ink); transform:translateY(1px);
+  display:inline-block;
+  line-height:1;
+  padding:2px 6px;
+  border-radius:12px;
+  border:2px solid var(--ink);
+  transform:translateY(1px);
 }
-.logo-s{ color:#fff; background:var(--ink) }
+.logo-s{ color:#fff; background:var(--ink); }
 
-.nav{display:flex; gap:22px}
-.nav-link{ color:var(--ink); text-decoration:none; font-weight:600; opacity:.8; transition:opacity .2s ease; }
-.nav-link:hover{opacity:1}
+.nav{display:flex; gap:22px;}
+.nav-link{
+  color:var(--ink);
+  text-decoration:none;
+  font-weight:600;
+  opacity:.8;
+  transition:opacity .2s ease;
+}
+.nav-link:hover{opacity:1;}
 
-/* Hero */
-.hero{ padding: clamp(40px, 7vw, 80px) clamp(16px, 6vw, 48px) 60px; }
+/* === Hero === */
+.hero{
+  padding: clamp(40px, 7vw, 80px) clamp(16px, 6vw, 48px) 60px;
+}
 .hero-title{
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
   font-size: clamp(44px, 12vw, 140px);
-  line-height:.9; letter-spacing:1px; margin: 12px 0 18px; color:var(--ink);
+  line-height:.9;
+  letter-spacing:1px;
+  margin:12px 0 18px;
+  color:var(--ink);
 }
-.hero-title::selection{background:var(--blue); color:#fff}
+.hero-title::selection{background:var(--blue); color:#fff;}
 
-/* Counter */
-.counter{ margin-top: clamp(14px, 3vw, 20px); }
-.counter-label{ font-weight:600; color:var(--ink-60); letter-spacing:.2px; }
+/* === Счётчик === */
+.counter{
+  margin-top: clamp(14px, 3vw, 20px);
+}
+.counter-label{
+  font-weight:600;
+  color:var(--ink-60);
+  letter-spacing:.2px;
+}
 
 /* Барабанная прокрутка */
-.counter-rolling{
-  display:inline-flex; align-items:baseline; gap:12px; margin-top:8px;
-  font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
-  color:var(--blue);
-}
-.counter-drum{
-  position:relative; overflow:hidden; display:inline-block;
-  height:1em; /* высота строки числа; масштабируем через font-size ниже */
-  line-height:1;
-  font-size: clamp(42px, 11vw, 120px);
-  text-shadow: 0 8px 28px rgba(53,99,255,.25);
-}
-.counter-drum .reel{
-  display:flex; flex-direction:column;
-  transform: translateY(0%);
-}
-.counter-drum.roll .reel{
-  transition: transform .7s cubic-bezier(.22,.65,.22,1);
-  transform: translateY(-100%);
-}
-.counter-drum .num{
-  display:block; height:1em; line-height:1;
-}
-.counter-k{
-  font-size: clamp(28px, 6.5vw, 56px);
-  color:var(--blue);
-  text-shadow: 0 8px 28px rgba(53,99,255,.2);
-}
-
-.counter-meta{ margin-top:6px; color:var(--ink-60); }
-.counter-notes{ margin-top:10px; color:var(--ink-60); }
-.counter-notes summary{ cursor:pointer; }
-/* ...остальной код без изменений выше */
-
 .counter-rolling{
   display:inline-flex;
   align-items:flex-end;
@@ -97,7 +99,7 @@ body{
   font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
   color:var(--blue);
   font-size: clamp(42px, 11vw, 120px);
-  text-shadow: 0 8px 28px rgba(53,99,255,.25);
+  text-shadow:0 8px 28px rgba(53,99,255,.25);
 }
 
 .counter-drum{
@@ -111,11 +113,8 @@ body{
   display:flex;
   flex-direction:column;
   transform: translateY(0%);
-}
-
-.counter-drum.roll .reel{
-  transition: transform 0.8s cubic-bezier(.22,.65,.22,1);
-  transform: translateY(-100%);
+  will-change:transform;
+  transition: transform .8s cubic-bezier(.22,.65,.22,1);
 }
 
 .counter-drum .num{
@@ -130,3 +129,14 @@ body{
   line-height:1;
   font-weight:700;
 }
+
+.counter-meta{
+  margin-top:6px;
+  color:var(--ink-60);
+}
+
+.counter-notes{
+  margin-top:10px;
+  color:var(--ink-60);
+}
+.counter-notes summary{cursor:pointer;}
