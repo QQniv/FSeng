@@ -50,13 +50,11 @@
     <section class="counter" aria-live="polite">
       <div class="counter-label">Сэкономлено пластиковых бутылок</div>
 
-      <!-- Двойная анимация: новая цифра заезжает сверху, старая уезжает вниз -->
+      <!-- Двойная анимация: новый въезжает сверху, старый уезжает вниз -->
       <div class="counter-rolling">
         <div class="counter-drum" id="drum">
-          <div class="reel">
-            <span class="num active" id="numCurrent">500&nbsp;тыс.</span>
-            <span class="num above"  id="numNext">1&nbsp;000&nbsp;тыс.</span>
-          </div>
+          <div class="pane pane--current" id="paneCurrent">500&nbsp;тыс.</div>
+          <div class="pane pane--next    pane--enter" id="paneNext">600&nbsp;тыс.</div>
         </div>
       </div>
 
@@ -64,8 +62,8 @@
       <details class="counter-notes">
         <summary>Что за цифра?</summary>
         <div>
-          Расчёт из допущения: ~200 млрд одноразовых бутылок в год ≈ 6 342 шт/сек (365 дней).
-          Отображение округлено шагом в 500 000 шт. («перелистывание» каждые ~78,8 сек).
+          Расчёт из допущения: ~200&nbsp;млрд одноразовых бутылок в год ≈ 6&nbsp;342 шт/сек (365 дней).
+          Отображение — шагами по 100&nbsp;000 шт. (перелистывание примерно раз в 15–16 секунд).
         </div>
       </details>
     </section>
