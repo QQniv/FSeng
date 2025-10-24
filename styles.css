@@ -87,3 +87,46 @@ body{
 .counter-meta{ margin-top:6px; color:var(--ink-60); }
 .counter-notes{ margin-top:10px; color:var(--ink-60); }
 .counter-notes summary{ cursor:pointer; }
+/* ...остальной код без изменений выше */
+
+.counter-rolling{
+  display:inline-flex;
+  align-items:flex-end;
+  gap:8px;
+  margin-top:8px;
+  font-family: Anton, Impact, 'Arial Black', system-ui, sans-serif;
+  color:var(--blue);
+  font-size: clamp(42px, 11vw, 120px);
+  text-shadow: 0 8px 28px rgba(53,99,255,.25);
+}
+
+.counter-drum{
+  position:relative;
+  overflow:hidden;
+  height:1em;
+  line-height:1;
+}
+
+.reel{
+  display:flex;
+  flex-direction:column;
+  transform: translateY(0%);
+}
+
+.counter-drum.roll .reel{
+  transition: transform 0.8s cubic-bezier(.22,.65,.22,1);
+  transform: translateY(-100%);
+}
+
+.counter-drum .num{
+  height:1em;
+  line-height:1;
+  display:block;
+  text-align:right;
+}
+
+.counter-k{
+  color:var(--blue);
+  line-height:1;
+  font-weight:700;
+}
