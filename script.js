@@ -1,36 +1,49 @@
-// Bottle-Saver Counter
-// Анимированный рост числа одноразовых бутылок, которых удалось избежать в РФ.
-// Скорость можно настроить по реальной статистике.
-const BOTTLES_PER_MIN = 2500; // <- поменяй под официальный источник
-const RATE_PER_MS = BOTTLES_PER_MIN / 60000;
+// === Bottle-Saver Counter (DE tens of thousands flip) ===
+// База: ~200_000_000_000 бутылок/год => ~6_341.958/сек при 365 сутках
+const YEAR_TOTAL = 200_000_000_000;
+const SECONDS_YEAR = 365 * 24 * 60 * 60;
+const PER_SECOND = YEAR_TOTAL / SECONDS_YEAR; // ≈ 6341.958
+const PER_MS = PER_SECOND / 1000;
+
+// Выводим ОКРУГЛЁННО до десятков тысяч (…0000) и «перелистываем» при смене разряда.
+const STEP = 10_000; // десятки тысяч
 
 const el = document.getElementById('bottleCounter');
 
-let value = 0;
+let value = 0;           // «физическое» значение в штуках (плавающее)
 let last = performance.now();
+let shownBucket = 0;     // текущее показанное значение, кратное STEP
 
-function format(num){
-  return Math.floor(num).toLocaleString('ru-RU');
+function formatBucket(n){
+  return n.toLocaleString('ru-RU');
+}
+
+function animateFlip(newText){
+  // триггерим классовую анимацию
+  el.classList.remove('flip');
+  // принудительный рефлоу для перезапуска анимации
+  void el.offsetWidth;
+  el.textContent = newText;
+  el.classList.add('flip');
 }
 
 function tick(now){
   const dt = now - last;
   last = now;
-  value += dt * RATE_PER_MS;
-  el.textContent = format(value);
+  value += dt * PER_MS; // прибавляем с физической скоростью
+
+  const bucket = Math.floor(value / STEP) * STEP;
+  if (bucket !== shownBucket){
+    shownBucket = bucket;
+    animateFlip(formatBucket(shownBucket));
+  }
+
   requestAnimationFrame(tick);
 }
 
 requestAnimationFrame(tick);
 
-// Учитываем prefers-reduced-motion
+// Prefers-reduced-motion: только обновление текста без 3D-поворота
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-  cancelAnimationFrame(tick);
-  setInterval(()=>{
-    const now = performance.now();
-    const dt = now - last;
-    last = now;
-    value += dt * RATE_PER_MS;
-    el.textContent = format(value);
-  }, 500);
+  el.classList.remove('flip');
 }
