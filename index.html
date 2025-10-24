@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FS — Новый подход к воде</title>
-  <meta name="description" content="FS — чистая вода как сервис: здоровье, экология, без бутылок и без хлопот." />
+  <meta name="description" content="FS — чистая вода как сервис: здоровье, экология, без пластика и без хлопот." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Anton — веб-альтернатива Impact -->
@@ -46,35 +46,27 @@
   </header>
 
   <main class="hero" role="main">
-    <h1 class="hero-title">
-      Новый подход к воде
-    </h1>
+    <h1 class="hero-title">Новый подход к воде</h1>
 
     <section class="counter">
       <div class="counter-label">Сэкономлено пластиковых бутылок</div>
-      <div class="counter-value" id="bottleCounter" aria-live="polite">0</div>
-      <div class="counter-meta">
-        в России — оценка в реальном времени<sup>*</sup>
+
+      <!-- Перелистывающийся вывод по десяткам тысяч -->
+      <div class="counter-flip">
+        <div class="counter-value" id="bottleCounter">0</div>
       </div>
+
+      <div class="counter-meta">в России — оценка в реальном времени*</div>
       <details class="counter-notes">
         <summary>Что за цифра?</summary>
         <div>
-          Счётчик показывает примерную динамику уменьшения одноразовых бутылок
-          благодаря переходу домохозяйств на фильтрацию и системы подачи питьевой воды.
-          Скорость легко скорректируем под официальную статистику.
+          Расчёт из допущения: ~200 млрд одноразовых бутылок в год ≈ 6 342 шт/сек.
+          Показатель округляем до десятков тысяч для визуальной «перелистки».
         </div>
       </details>
     </section>
-
-    <div class="cta-row">
-      <a class="btn-primary" href="#">Рассчитать для моего дома</a>
-      <a class="btn-ghost" href="#">Оставить заявку</a>
-    </div>
+    <!-- ниже пока ничего: остальные блоки добавим на следующих шагах -->
   </main>
-
-  <footer class="site-footer">
-    <small>© 2025 FS. Чистая вода как сервис. <span class="dot">•</span> ESG-подход без пластика.</small>
-  </footer>
 
   <script src="./script.js"></script>
 </body>
