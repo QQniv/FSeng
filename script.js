@@ -1,132 +1,119 @@
-// === Bottle-Saver Counter — двойная прокрутка сверху вниз, шаг 500 тыс. ===
+// === Bottle-Saver Counter — шаг 100 тыс., плавный «верх→низ», без откатов ===
 const YEAR_TOTAL   = 200_000_000_000;
 const SECONDS_YEAR = 365 * 24 * 60 * 60;
 const PER_SECOND   = YEAR_TOTAL / SECONDS_YEAR;    // ≈ 6341.958
 const PER_MS       = PER_SECOND / 1000;
-const STEP         = 500_000;                      // перелистывание каждые полмиллиона
+const STEP         = 100_000;                      // перелистывание каждые 100 тыс.
 
-// Стартовое значение по запросу
-let value       = 500_000;                         // «физическое» число бутылок
-let shownBucket = 500_000;                         // показанное кратное STEP
+// Стартовое значение (можно поменять на расчёт «с начала года»)
+let value       = 500_000;
+let shownBucket = 500_000;
 let last        = performance.now();
-let animating   = false;
-let pendingBucket = null;
 
-const drum       = document.getElementById('drum');
-const numCurrent = document.getElementById('numCurrent'); // видимый слой
-const numNext    = document.getElementById('numNext');    // верхний слой (заезжает сверху)
+const drum        = document.getElementById('drum');
+let paneCurrent   = document.getElementById('paneCurrent');
+let paneNext      = document.getElementById('paneNext');
 
-function formatDisplay(n){
+function fmt(n){
+  // «X тыс.» с неразрывными пробелами
   const thousands = (n / 1000).toLocaleString('ru-RU');
   return `${thousands} тыс.`;
 }
 
-// подгоняем ширину барабана под самое длинное из двух значений
-function adjustDrumWidth(){
-  // временно сделаем элементы видимыми для замера
-  const w1 = measureWidth(numCurrent);
-  const w2 = measureWidth(numNext);
-  const w  = Math.max(w1, w2);
-  drum.style.width = w + 'px';
-}
-
-function measureWidth(el){
-  const clone = el.cloneNode(true);
-  clone.style.position = 'absolute';
-  clone.style.visibility = 'hidden';
-  clone.style.opacity = '0';
-  clone.className = 'num active'; // чтобы был в естественном положении
-  drum.appendChild(clone);
-  const w = clone.getBoundingClientRect().width;
-  drum.removeChild(clone);
+function measureWidth(text){
+  // создаём невидимый клон, чтобы померить ширину
+  const probe = document.createElement('div');
+  probe.className = 'pane pane--current';
+  probe.style.position = 'absolute';
+  probe.style.visibility = 'hidden';
+  probe.style.opacity = '0';
+  probe.textContent = text;
+  drum.appendChild(probe);
+  const w = probe.getBoundingClientRect().width;
+  probe.remove();
   return w;
 }
 
-function setInitial(){
-  numCurrent.textContent = formatDisplay(shownBucket);
-  numCurrent.className   = 'num active';
-
-  numNext.textContent = formatDisplay(shownBucket + STEP);
-  numNext.className   = 'num above';
-
-  adjustDrumWidth();
+function adjustWidth(){
+  const w = Math.max(measureWidth(paneCurrent.textContent),
+                     measureWidth(paneNext.textContent));
+  drum.style.width = w + 'px';
 }
 
+function setInitial(){
+  paneCurrent.textContent = fmt(shownBucket);
+  paneCurrent.className   = 'pane pane--current';
+
+  paneNext.textContent    = fmt(shownBucket + STEP);
+  paneNext.className      = 'pane pane--enter';
+
+  adjustWidth();
+}
+
+let animating = false;
+let pendingBucket = null;
+
 function animateTo(targetBucket){
-  if (animating) return;
+  if (animating) { pendingBucket = targetBucket; return; }
   animating = true;
 
-  // готовим верхний слой к новому значению
-  numNext.textContent = formatDisplay(targetBucket);
-  adjustDrumWidth();
+  // подготовим текст для «въезжающей» сверху
+  paneNext.textContent = fmt(targetBucket);
+  adjustWidth();
 
-  // встречная анимация
-  numCurrent.classList.remove('active'); numCurrent.classList.add('below');
-  numNext.classList.remove('above');     numNext.classList.add('active');
+  // запускаем: текущая уходит вниз, следующая въезжает
+  paneCurrent.classList.remove('pane--current');
+  paneCurrent.classList.add('pane--leave');
 
-  const onDone = () => {
+  paneNext.classList.remove('pane--enter');
+  paneNext.classList.add('pane--current');
+
+  // когда въезжающая закончила анимацию — меняем роли без резкого «отката»
+  const onEnd = (e) => {
+    if (e.propertyName !== 'transform') return;
+    paneNext.removeEventListener('transitionend', onEnd);
+
     shownBucket = targetBucket;
 
-    // меняем роли
-    numCurrent.textContent = numNext.textContent;
-    numCurrent.className = 'num active';
+    // меняем ссылки: current ↔ next
+    const old = paneCurrent;
+    paneCurrent = paneNext;
+    paneNext    = old;
 
-    numNext.textContent = formatDisplay(shownBucket + STEP);
-    numNext.className = 'num above';
+    // готовим «новую верхнюю» на следующий шаг и прячем её сверху
+    paneNext.className   = 'pane pane--enter';
+    paneNext.textContent = fmt(shownBucket + STEP);
 
     animating = false;
 
     if (pendingBucket && pendingBucket !== shownBucket){
       const nb = pendingBucket;
       pendingBucket = null;
-      setTimeout(()=>animateTo(nb), 16);
+      // минимальная задержка, чтобы браузер применил классы
+      setTimeout(()=>animateTo(nb), 0);
     }
   };
 
-  numNext.addEventListener('transitionend', function handler(e){
-    if (e.propertyName !== 'transform') return;
-    numNext.removeEventListener('transitionend', handler);
-    onDone();
-  });
+  paneNext.addEventListener('transitionend', onEnd);
 }
 
 function tick(now){
   const dt = now - last;
   last = now;
-  value += dt * PER_MS; // непрерывный рост пока вкладка активна
+  value += dt * PER_MS; // непрерывный рост
 
   const bucket = Math.floor(value / STEP) * STEP;
-  if (bucket !== shownBucket){
-    if (animating){
-      pendingBucket = bucket;
-    } else {
-      animateTo(bucket);
-    }
+  if (bucket > shownBucket){
+    animateTo(bucket);
   }
-
   requestAnimationFrame(tick);
 }
 
-function init(){
-  setInitial();
-  requestAnimationFrame(tick);
-}
-init();
+setInitial();
+requestAnimationFrame(tick);
 
-// prefers-reduced-motion — без анимации, просто обновление текста
+// Уважение prefers-reduced-motion — без анимации, просто обновляем текст
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-  const updateNoMotion = () => {
-    const dt = performance.now() - last;
-    last += dt;
-    value += dt * PER_MS;
-    const bucket = Math.floor(value / STEP) * STEP;
-    if (bucket !== shownBucket){
-      shownBucket = bucket;
-      numCurrent.textContent = formatDisplay(shownBucket);
-      numNext.textContent    = formatDisplay(shownBucket + STEP);
-      adjustDrumWidth();
-    }
-    requestAnimationFrame(updateNoMotion);
-  };
-  updateNoMotion();
+  paneCurrent.style.transition = 'none';
+  paneNext.style.transition    = 'none';
 }
